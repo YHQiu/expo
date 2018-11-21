@@ -136,16 +136,24 @@ platform :android do
     adb(command: "shell am start -n host.exp.exponent/host.exp.exponent.LauncherActivity")
   end
 
+  lane :build do |build_type: "Debug"|
+    gradle(
+      project_dir: "android",
+      task: "app:assemble",
+      flavor: "ProdKernel",
+      build_type: "Debug",
+    )
+  end
+
   lane :prod_release do
     build_gradle = File.read("../android/app/build.gradle")
 
     verify_changelog_exists(version_code: build_gradle.match(/versionCode (\d+)/)[1])
     verify_upload_to_staging(version_name: build_gradle.match(/versionName '([\d\.]+)'/)[1])
 
+    build(build_type: "Release")
     supply(
-      package_name: "host.exp.exponent",
       metadata_path: "./fastlane/android/metadata",
-      apk: "./android/app/build/outputs/apk/prodKernel/release/app-prodKernel-release.apk",
       track: "production",
       skip_upload_images: true,
       skip_upload_screenshots: true
