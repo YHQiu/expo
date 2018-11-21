@@ -7,10 +7,15 @@ let
 
 in
 
-mkShell {
+mkShell rec {
 
   LANG="en_US.UTF-8";
   JAVA_HOME=openjdk8;
+
+  ANDROID_SDK_ROOT=builtins.getEnv("HOME") + (if stdenv.isDarwin then "/Library/Android/sdk" else "/Android/Sdk");
+  ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk-bundle";
+  ANDROID_HOME=ANDROID_SDK_ROOT;
+  ANDROID_NDK=ANDROID_NDK_ROOT;
 
   nativeBuildInputs = [
     fastlane
